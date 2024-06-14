@@ -14,11 +14,18 @@ export default function App() {
     try {
       const response = await fetch('http://192.168.29.87:5000/readings');
       const result = await response.json();
-      setData({
-        temperature_c: result.temperature_c,
-        temperature_f: result.temperature_f,
-        humidity: result.humidity,
-      });
+      // Check if the result does not contain an error key
+      if (!result.error) {
+        setData({
+          temperature_c: result.temperature_c,
+          temperature_f: result.temperature_f,
+          humidity: result.humidity,
+        });
+        console.log('Data fetched:', result);
+      } else {
+        // Log the error but do not update the state
+        console.log('Error in fetched data:', result.error);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     }
