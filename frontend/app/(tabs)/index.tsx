@@ -1,14 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { Title, Subheading } from 'react-native-paper';
 import Svg, { Circle } from 'react-native-svg';
 
 export default function App() {
+  const [data, setData] = useState({
+    temperature_c: '--',
+    temperature_f: '--',
+    humidity: '--',
+  });
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://192.168.29.87:5000/readings');
+      const result = await response.json();
+      setData({
+        temperature_c: result.temperature_c,
+        temperature_f: result.temperature_f,
+        humidity: result.humidity,
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval); // Clean up the interval on component unmount
+  }, []);
+
   return (
     <View style={styles.container}>
       <Title style={styles.header}>Insights</Title>
       <View style={styles.temperatureContainer}>
-        <Text style={styles.temperature}>33°C</Text>
+        <Text style={styles.temperature}>{data.temperature_c}°C</Text>
         <Subheading style={styles.label}>Temperature</Subheading>
       </View>
       <View style={styles.dataContainer}>
@@ -17,21 +43,21 @@ export default function App() {
             <Circle cx="10" cy="10" r="8" fill="#4cd964" />
           </Svg>
           <Text style={styles.dataText}>Current temp C</Text>
-          <Text style={styles.dataValue}>33°C</Text>
+          <Text style={styles.dataValue}>{data.temperature_c}°C</Text>
         </View>
         <View style={styles.dataRow}>
           <Svg height="20" width="20" style={styles.icon}>
             <Circle cx="10" cy="10" r="8" fill="#4cd964" />
           </Svg>
           <Text style={styles.dataText}>Current temp F</Text>
-          <Text style={styles.dataValue}>91°F</Text>
+          <Text style={styles.dataValue}>{data.temperature_f}°F</Text>
         </View>
         <View style={styles.dataRow}>
           <Svg height="20" width="20" style={styles.icon}>
             <Circle cx="10" cy="10" r="8" fill="#4cd964" />
           </Svg>
           <Text style={styles.dataText}>Humidity</Text>
-          <Text style={styles.dataValue}>61%</Text>
+          <Text style={styles.dataValue}>{data.humidity}%</Text>
         </View>
       </View>
     </View>
