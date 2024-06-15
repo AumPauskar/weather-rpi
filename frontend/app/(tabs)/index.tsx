@@ -12,7 +12,7 @@ export default function App() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://192.168.29.87:5000/readings');
+      const response = await fetch('https://5063-2405-201-d00a-a8fc-6c17-25f9-e3f9-84a3.ngrok-free.app/readings');
       const result = await response.json();
       // Check if the result does not contain an error key
       if (!result.error) {
