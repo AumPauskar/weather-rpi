@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Title, Subheading } from 'react-native-paper';
 import Svg, { Circle } from 'react-native-svg';
 
@@ -14,7 +14,6 @@ export default function App() {
     try {
       const response = await fetch('http://192.168.29.87:5000/readings');
       const result = await response.json();
-      // Check if the result does not contain an error key
       if (!result.error) {
         setData({
           temperature_c: result.temperature_c,
@@ -23,7 +22,6 @@ export default function App() {
         });
         console.log('Data fetched:', result);
       } else {
-        // Log the error but do not update the state
         console.log('Error in fetched data:', result.error);
       }
     } catch (error) {
@@ -31,10 +29,20 @@ export default function App() {
     }
   };
 
+  const handleFanOn = async () => {
+    try {
+      const response = await fetch('http://192.168.29.87:5000/fanon', { method: 'GET' });
+      const result = await response.json();
+      console.log('Fan on response:', result);
+    } catch (error) {
+      console.error('Error turning fan on:', error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -66,6 +74,9 @@ export default function App() {
           <Text style={styles.dataText}>Humidity</Text>
           <Text style={styles.dataValue}>{data.humidity}%</Text>
         </View>
+        <TouchableOpacity style={styles.button} onPress={handleFanOn}>
+        <Text style={styles.buttonText}>Turn Relay On</Text>
+      </TouchableOpacity>
       </View>
     </View>
   );
@@ -82,6 +93,17 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#4cd964',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   temperatureContainer: {
     alignItems: 'center',
